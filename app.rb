@@ -35,14 +35,14 @@ post '/' do
            WHERE (Username = \'%{Username}\' AND Password = \'%{Password}\');' %
            {:Username => username, :Password => password}
   user = select(query)
-  unless user.empty?
+  if user.empty?
+    # Login failed
+    slim :login
+  else
     puts user
     if user[0]["Username"].equal?(username)
       slim :application
     end
-  else
-    # Login failed
-    slim :login
   end
 end
 
