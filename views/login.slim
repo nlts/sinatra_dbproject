@@ -1,13 +1,22 @@
 doctype html
 html
-	head
-		meta charset="utf-8"
-		title Login
-	body
-		form action = "/" method="POST"
-		    p Username
-			input type="text" name="username"
-			p Password
-			input type="text" name="password"
-			input.button type="submit" value="Login"
+  head
+    == render :slim, :'header'
+    title Login
+  body
+    div style="width:20%; min-width:300px; margin:0 auto;"
+      h1 AAHP Login
+      form role="form"  action="/login" method="POST"
+        div.form-group
+          label for="username" Username
+          input.form-control type="text" id="username" name="username"
+        div.form-group
+          label for="password" Password
+          input.form-control type="text" id="password" name="password"
+        input.button.btn.btn-default type="submit" value="Login"
+      p
+      a href="/register"
+        button.btn.btn-default Register
+
+
 
