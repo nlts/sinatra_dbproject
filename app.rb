@@ -45,6 +45,13 @@ get '/application' do
   slim :application
 end
 
+get '/home' do
+  slim :home
+end
+
+
+
+
 post '/register' do
   query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
           ('#{params[:username]}',
@@ -61,3 +68,4 @@ post '/register' do
     redirect to('/register')
   end
 end
+
