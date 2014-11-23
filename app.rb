@@ -8,7 +8,7 @@ require 'slim'
 require 'date'
 require 'bigdecimal'
 
-#import JDBC/MySQL functions
+#import JDBC/MySQL functions from mysql.rb
 require_relative('mysql')
 
 config_file 'database.yml'
@@ -30,6 +30,7 @@ post '/login' do
     # No users retrieved with query
     redirect to('/login')
   elsif user[0]["Username"] === params[:username]
+    @current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
     redirect to('/application')
   else
     redirect to('/login')
@@ -54,6 +55,7 @@ post '/register' do
            'Resident');"
   result = insert(query)
   if result == 1
+    @current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
     redirect to('/application')
   else
     redirect to('/register')
