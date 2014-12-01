@@ -13,6 +13,9 @@ require_relative('mysql')
 
 config_file 'database.yml'
 
+
+
+
 get '/' do
   redirect to ('/login')
 end
@@ -37,20 +40,10 @@ post '/login' do
   end
 end
 
+
 get '/register' do
   slim :register
 end
-
-get '/application' do
-  slim :application
-end
-
-get '/home' do
-  slim :home
-end
-
-
-
 
 post '/register' do
   query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
@@ -69,3 +62,36 @@ post '/register' do
   end
 end
 
+get '/home' do
+  slim :home
+end
+
+get '/application' do
+  slim :register
+end
+
+post '/application' do
+  query = "INSERT INTO User(Name, DOB, Gender, Monthly_income, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Move_in_date, Lease_term, Previous_address) VALUES
+          ('#{params[:name]}',
+           '#{params[:dob]}',
+           '#{params[:monthly_income]}',
+           '#{params[:pref_apt_category]}',
+           '#{params[:pref_rent_range_min]}',
+           '#{params[:pref_rent_range_max]}',
+           '#{params[:move_in_date]}',
+           '#{params[:lease_term]}',
+           '#{params[:previous_address]}',
+           'Resident');"
+  result = insert(query)
+  if result == 1
+    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
+    redirect to('/home')
+  else
+    redirect to('/application')
+  end
+end
+
+
+post '/home' do
+  query =
+end
