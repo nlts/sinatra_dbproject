@@ -46,15 +46,13 @@ get '/register' do
 end
 
 post '/register' do
-  query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
+  query = "INSERT INTO User(Username, Password) VALUES
           ('#{params[:username]}',
            '#{params[:password]}',
-           '#{params[:name]}',
-           '#{params[:dob]}',
-           '#{params[:gender]}',
+           '#{params[:confirm_password]}',
            'Resident');"
   result = insert(query)
-  if result == 1
+  if (result == 1 & (params[:password] == params[:confirm_password]))
     #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
     redirect to('/application')
   else
