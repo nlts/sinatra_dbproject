@@ -1,1 +1,11 @@
-h1 = @user
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Home
+body
+  div style="width:30%; min-width:400px; margin:0 auto;"
+    h1 Home
+    p User: #{@user}
+    p Apartment number: #{@apartment_number}
+    p Count: #{@messages_count}

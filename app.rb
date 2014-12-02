@@ -15,6 +15,8 @@ config_file 'database.yml'
 
 configure do
   @@user = ""
+  @@apartment_number = ""
+  @@role = ""
 end
 
 
@@ -48,6 +50,7 @@ post '/login' do
       slim :under_review
     elsif status[0]["Status"] === "Approved"
       @@user = user[0]["Username"]
+      @@role = user[0]["Role"]
       redirect to('/home')
     end
   else
@@ -124,6 +127,20 @@ end
 
 get '/home' do
   @user = @@user
+  @role = @@role
+  apartment_query = "SELECT Apartment_num FROM Apartment A
+                     WHERE A.Tenant = '#{@user}'"
+  result = select(apartment_query)
+  @@apartment_number = result[0]["Apartment_num"]
+  @apartment_number = @@apartment_number
+
+  # check role and status
+  # get messages count
+  messages_query = "SELECT Apartment_num, COUNT(*) FROM Reminder R
+                    WHERE R.Apartment_num = '#{@apartment_number}'"
+  messages_result = select(messages_query)
+  @messages_count = messages_result[0]["COUNT(*)"]
+
   slim :home
 end
 
@@ -158,7 +175,7 @@ end
 
 get '/maintenance_request' do
   @date = Time.now.to_date
-  apartment_request = "SELECT Apartment_num FROM Apartment WHERE '#{@@user}' = Tenant"
+  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@user}'"
   @apartment_number = select(apartment_request)
   @apartment_number = @apartment_number[0]["Apartment_num"]
   issues_request = "SELECT * FROM Issue"
