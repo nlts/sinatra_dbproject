@@ -1,0 +1,28 @@
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Register
+body
+  div style="width:30%; min-width:500; margin:0 auto;"
+    h2 Management Functions:
+    a href="/application_review"
+        button.btn.btn-default Application Review
+    p
+    a href="/view_maintenance_req"
+      button.btn.btn-default View Maintenance Requests
+    p
+    a href="/reminders"
+      button.btn.btn-default View Reminders
+    h2 Reports:
+    p
+    a href="/leasing_rep"
+      button.btn.btn-default Leasing report
+    p
+    a href="/service_req_res_rep"
+      button.btn.btn-default Service Request Resolution Report
+    p
+    a href="/defaulters"
+      button.btn.btn-default Defaulters Report
+
+
