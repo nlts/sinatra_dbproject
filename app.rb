@@ -93,7 +93,7 @@ post '/application' do
                    Pref_rent_range_max, Date_of_application, Previous_address, Approved, Balance,
                    Payment_status, Move_out_date) VALUES ('#{params[:username]}', 'Prospective',
                    '#{params[:lease_term]}', '#{params[:monthly_income]}', '#{params[:move_in_date]}',
-                   '#{params[:pref_apt_category]}', '#{params[:pref_rent_range_min]}', '#{params[:pref_rent_range_max]}', CURDATE(), '#{params[:previous_addres]}',
+                   '#{params[:pref_apt_category]}', '#{params[:pref_rent_range_min]}', '#{params[:pref_rent_range_max]}', CURDATE(), '#{params[:previous_address]}',
                    (CASE WHEN Move_in_date > CURDATE()+60
                    THEN 'Rejected'
                    WHEN EXISTS(SELECT 1 FROM Apartment
