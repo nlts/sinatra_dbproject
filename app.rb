@@ -249,8 +249,14 @@ get '/view_maintenance_req' do
 end
 
 post '/view_maintenance_req' do
-  puts params
-  "hello"
+  apartment_num = params["Apartment_num"]
+  date_time_requested = params["Date_time_requested"]
+
+  update_query = "UPDATE Maintenance_Request
+   SET Date_resolved = CURDATE(), Status = 'Resolved'
+   WHERE Apartment_num = '#{apartment_num}' and Date_time_requested = '#{date_time_requested}'"
+  result = insert(update_query)
+  redirect to('/view_maintenance_req')
 end
 
 
