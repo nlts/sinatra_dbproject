@@ -1,51 +1,50 @@
 doctype html
 html
-  head
-    == render :slim, :'header'
-  body
-    div style="width:20%; min-width:400px; margin:0 auto;"
-      h1 Create account
-      form role="form" action="/application" method="POST"
-        div.form-group
-          label for="username" Username:
-          input.form-control type="text" id="username" name="username"
-        div.form-group
-          label for="password" Password:
-          input.form-control type="text" id="password" name="password"
-        div.form-group
-          label for="role" Role:
-        div.form-group
-          label for="name" Name:
-          input.form-control type="text" id="name" name="name"
-        div.form-group
-          label for="dob" DOB (YYYY-MM-DD):
-          input.form-control type="text" id="dob" name="dob"
-        div.form-group
-          label for="gender" Gender:
-          input.form-control type="text" id="gender" name="gender"
-          label for="monthly_income" Monthly Income ($):
-          input.form-control type="text" id="monthly_income" name="monthly_income"
-        div.form-group
-          label for="pref_apt_category" Category of Apartment:
-          select name = "pref_apt_category"
-            option value = "1bdr - 1bth" 1bdr - 1bth
-            option value = "2bdr - 1bth" 2bdr - 1bth
-            option value = "2bdr - 2bth" 2bdr - 2bth
-          label for="pref_rent_range_min" Monthly Rent ($) min:
-          input.form-control type="text" id="pref_rent_range_min" name="pref_rent_range_min"
-        div.form-group
-          label for="pref_rent_range_max" Monthly Rent ($) max:
-          input.form-control type="text" id="pref_rent_range_max" name="pref_rent_range_max"
-        div.form-group
-          label for="move_in_date" Preferred Move in Date:
-          input.form-control type="text" id="move_in_date" name="move_in_date"
-        div.form-group
-          label for="lease_term" Lease Term:
-          select name = "lease_term"
-            option value = "3 months" 3 Months
-            option value = "6 months" 6 Months
-            option value = "9 months" 9 Months
-        div.form-group
-          label for="previous_address" Previous Residence:
-          input.form-control type="text" id="previous_address" name="previous_address"
-        input.button.btn.btn-default type="submit" value="Apply"
+head
+  == render :slim, :'header'
+body
+  div style="width:20%; min-width:400px; margin:0 auto; padding-bottom:100px;"
+    h1 Rental Application
+    form role="form" action="/application" method="POST"
+      div.form-group
+        label for="username" Username:
+        input.form-control type="text" id="username" name="username"
+      div.form-group
+        label for="password" Password:
+        input.form-control type="text" id="password" name="password"
+      div.form-group
+        label for="name" Name:
+        input.form-control type="text" id="name" name="name"
+      div.form-group
+        label for="dob" DOB (YYYY-MM-DD):
+        input.form-control type="text" id="dob" name="dob"
+      div.form-group
+        label for="gender" Gender:
+        input.form-control type="text" id="gender" name="gender"
+        label for="monthly_income" Monthly Income (ex. 3000):
+        input.form-control type="text" id="monthly_income" name="monthly_income"
+      div.form-group
+        label for="pref_apt_category" Category of Apartment:
+        select.form-control name="pref_apt_category"
+          option value="1bdr - 1bth" 1bdr - 1bth
+          option value="2bdr - 1bth" 2bdr - 1bth
+          option value="2bdr - 2bth" 2bdr - 2bth
+      div.form-group
+        label for="pref_rent_range_min" Monthly Rent min (ex. 500):
+        input.form-control type="text" id="pref_rent_range_min" name="pref_rent_range_min"
+      div.form-group
+        label for="pref_rent_range_max" Monthly Rent ($) max (ex. 5000):
+        input.form-control type="text" id="pref_rent_range_max" name="pref_rent_range_max"
+      div.form-group
+        label for="move_in_date" Preferred Move in Date (YYYY-MM-DD):
+        input.form-control type="text" id="move_in_date" name="move_in_date"
+      div.form-group
+        label for="lease_term" Lease Term:
+        select.form-control name="lease_term"
+          option value="3 months" 3 Months
+          option value="6 months" 6 Months
+          option value="9 months" 9 Months
+      div.form-group
+        label for="previous_address" Previous Residence:
+        input.form-control type="text" id="previous_address" name="previous_address"
+      input.button.btn.btn-default type="submit" value="Apply"

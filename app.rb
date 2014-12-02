@@ -59,6 +59,7 @@ post '/register' do
 end
 
 get '/home' do
+  @user = @@user
   slim :home
 end
 
@@ -142,36 +143,42 @@ get '/application' do
 end
 
 post '/application' do
-  query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
-          ('#{params[:username]}',
-           '#{params[:password]}',
-           '#{params[:name]}',
-           '#{params[:dob]}',
-           '#{params[:gender]}',
-           'Resident');"
+  user_query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
+               ('#{params[:username]}',
+               '#{params[:password]}',
+               '#{params[:name]}',
+               '#{params[:dob]}',
+               '#{params[:gender]}',
+               'Resident');"
 
-  query = "INSERT INTO Resident(Name, Status, Approved, Balance, Payment_status, Move_out_date, DOB, Gender, Monthly_income, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Move_in_date, Lease_term, Previous_address) VALUES
-          ('#{params[:name]}',
-           'Pending',
-           0,
-           0.00,
-           'Pending',
-           '0000-00-00',
-           '#{params[:dob]}',
-           '#{params[:gender]}',
+  resident_query = "INSERT INTO Resident(Username, Status, Lease_term, Monthly_income, Move_in_date, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Date_of_application, Previous_address, Approved, Balance, Payment_status, Move_out_date) VALUES
+          ('#{params[:username]}',
+           'Prospective',
+           '#{params[:lease_term]}',
            '#{params[:monthly_income]}',
+           '#{params[:move_in_date]}',
            '#{params[:pref_apt_category]}',
            '#{params[:pref_rent_range_min]}',
            '#{params[:pref_rent_range_max]}',
-           '#{params[:move_in_date]}',
-           '#{params[:lease_term]}',
-           '#{params[:previous_address]}'};"
-  result = insert(query)
-  if result == 1
+           '1994-02-02',
+           '#{params[:previous_address]}',
+           '0',
+           '0.00',
+           'Not yet approved',
+           '#{params[:move_in_date]}');"
+  user_result = insert(user_query)
+  if user_result == 1
+    resident_result = insert(resident_query)
+  end
+  if user_result == 1 && resident_result == 1
     #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
+    @@user = params[:username]
+    @@dob = params[:dob]
+    @@role = 'Resident'
     redirect to('/home')
   else
     redirect to('/application')
   end
+
 end
 
