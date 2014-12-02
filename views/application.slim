@@ -12,7 +12,8 @@ html
         div.form-group
           label for="password" Password:
           input.form-control type="text" id="password" name="password"
-
+        div.form-group
+          label for="role" Role:
         div.form-group
           label for="name" Name:
           input.form-control type="text" id="name" name="name"
@@ -26,7 +27,7 @@ html
           input.form-control type="text" id="monthly_income" name="monthly_income"
         div.form-group
           label for="pref_apt_category" Category of Apartment:
-          select
+          select name = "pref_apt_category"
             option value = "1bdr - 1bth" 1bdr - 1bth
             option value = "2bdr - 1bth" 2bdr - 1bth
             option value = "2bdr - 2bth" 2bdr - 2bth
@@ -40,7 +41,7 @@ html
           input.form-control type="text" id="move_in_date" name="move_in_date"
         div.form-group
           label for="lease_term" Lease Term:
-          select
+          select name = "lease_term"
             option value = "3 months" 3 Months
             option value = "6 months" 6 Months
             option value = "9 months" 9 Months
