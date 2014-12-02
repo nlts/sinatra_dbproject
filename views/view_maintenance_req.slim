@@ -1,0 +1,43 @@
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Maintenance Request
+body
+  div style="width:80%; min-width:700px; margin:0 auto;"
+    h1 Maintenance Requests
+    form role="form" action="/view_maintenance_req" method="POST"
+      - unless @unresolved.empty?
+        table.table.table-striped
+          thead
+            th Time requested
+            th Apartment number
+            th Issue type
+            th
+          tbody
+          - for request in @unresolved do
+            tr
+              td.req = "#{request["Date_time_requested"]}"
+              td.aptnum = "#{request["Apartment_num"]}"
+              td.type = "#{request["Issue_type"]}"
+              td
+                div.checkbox
+                  label
+                    input type="radio" name="Date_time_requested" value="#{request["Date_time_requested"]}"
+                    input type="hidden" name="Apartment_num" value="#{request["Apartment_num"]}"
+      input.button.btn.btn-default type="submit" value="Mark resolved"
+    h3 Resolved requests
+    - unless @resolved.empty?
+      table.table.table-striped
+        thead
+          th Time requested
+          th Apartment number
+          th Issue type
+          th Checkbox
+        tbody
+        - for request in @resolved do
+          tr
+            td.req = "#{request["Date_time_requested"]}"
+            td.aptnum = "#{request["Apartment_num"]}"
+            td.type = "#{request["Issue_type"]}"
+            td.end = "#{request["Date_resolved"]}"

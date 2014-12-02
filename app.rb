@@ -35,7 +35,6 @@ post '/login' do
   user = select(query)
 
   if user.empty?
-    # No users retrieved with query
     redirect to('/login')
   elsif user[0]["Role"] === "Manager" or user[0]["Role"] === "Administrator"
     redirect to('/management')
@@ -43,11 +42,11 @@ post '/login' do
     status_query = "SELECT Status FROM Resident WHERE ('#{params[:username]}' = Username)"
     status = select(status_query)
     if status.empty?
-      # No residents retrieved with query
       redirect to('/login')
     elsif status[0]["Status"] === "Prospective"
-      # "Your application is under review'"
       slim :under_review
+    elsif status[0]["Status"] === "Rejected"
+      slim :rejected
     elsif status[0]["Status"] === "Approved"
       @@user = user[0]["Username"]
       @@role = user[0]["Role"]
@@ -74,7 +73,7 @@ post '/application' do
                '#{params[:gender]}',
                'Resident');"
 
-  resident_query = "INSERT INTO Resident(Username, Status, Lease_term, Monthly_income, Move_in_date, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Date_of_application, Previous_address, Approved, Balance, Payment_status, Move_out_date) VALUES
+  old_resident_query = "INSERT INTO Resident(Username, Status, Lease_term, Monthly_income, Move_in_date, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Date_of_application, Previous_address, Approved, Balance, Payment_status, Move_out_date) VALUES
           ('#{params[:username]}',
            'Prospective',
            '#{params[:lease_term]}',
@@ -89,6 +88,26 @@ post '/application' do
            '0.00',
            'Not yet approved',
            '#{params[:move_in_date]}');"
+  resident_query = "INSERT INTO Resident(Username, Status, Lease_term,
+                   Monthly_income, Move_in_date, Pref_apt_category, Pref_rent_range_min,
+                   Pref_rent_range_max, Date_of_application, Previous_address, Approved, Balance,
+                   Payment_status, Move_out_date) VALUES ('#{params[:username]}', 'Prospective',
+                   '#{params[:lease_term]}', '#{params[:monthly_income]}', '#{params[:move_in_date]}',
+                   '#{params[:pref_apt_category]}', '#{params[:pref_rent_range_min]}', '#{params[:pref_rent_range_max]}', CURDATE(), '#{params[:previous_addres]}',
+                   (CASE WHEN Move_in_date > CURDATE()+60
+                   THEN 'Rejected'
+                   WHEN EXISTS(SELECT 1 FROM Apartment
+                   WHERE Apartment.Category = '#{params[:pref_apt_category]}'
+                   and Apartment.Date_available > '#{params[:move_in_date]}')
+                   and 6000 > (SELECT Apartment.Rent FROM Apartment
+                   WHERE Apartment.Category = '#{params[:pref_apt_category]}'
+                   and Apartment.Date_available > '#{params[:move_in_date]}'
+                   ORDER BY Apartment.Rent ASC Limit 1) THEN 'Approved'
+                   ELSE 'Rejected'
+                   END),
+                   0.00,
+                   'Current',
+                   NULL)"
   user_result = insert(user_query)
   if user_result == 1
     resident_result = insert(resident_query)
@@ -98,7 +117,7 @@ post '/application' do
     @@user = params[:username]
     @@dob = params[:dob]
     @@role = 'Resident'
-    redirect to('/home')
+    slim :under_review
   else
     # register failed - display message?
     redirect to('/application')
@@ -218,8 +237,29 @@ get '/apartment_allot' do
 end
 
 get '/view_maintenance_req' do
+  unresolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type
+                    FROM Maintenance_Request
+                    WHERE Status = 'Unresolved'"
+  @unresolved = select(unresolved_query)
+  resolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type, Date_resolved
+                    FROM Maintenance_Request
+                    WHERE Status = 'Resolved'"
+  @resolved = select(resolved_query)
   slim :view_maintenance_req
 end
+
+post '/view_maintenance_req' do
+  apartment_num = params["Apartment_num"]
+  date_time_requested = params["Date_time_requested"]
+
+  update_query = "UPDATE Maintenance_Request
+   SET Date_resolved = CURDATE(), Status = 'Resolved'
+   WHERE Apartment_num = '#{apartment_num}' and Date_time_requested = '#{date_time_requested}'"
+  result = insert(update_query)
+  redirect to('/view_maintenance_req')
+end
+
+
 
 get '/reminders' do
   slim :reminders

@@ -1,0 +1,11 @@
+doctype html
+  html
+  head
+    == render :slim, :'header'
+    title Application rejected
+  body
+    div style="width:40%; min-width:300px; margin:0 auto;"
+      h3 Your application was rejected.
+      p
+      a href="/register"
+        button.btn.btn-default Reapply
