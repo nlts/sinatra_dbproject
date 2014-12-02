@@ -262,13 +262,25 @@ end
 
 
 get '/reminders' do
+
   slim :reminders
 end
 
 #reports (management only)
 
 get '/leasing_rep' do
+  leasingrep_query = "SELECT MONTHNAME(R.Move_in_date) AS Month, R.Pref_apt_category, COUNT(R.Username) AS 'No of Apartments' FROM Resident R
+      WHERE Month IN ('August', 'September', 'October')
+      GROUP BY Month, R.Pref_apt_category
+      ORDER BY Month, R.Pref_apt_category"
+  @leasingrep = select(leasingrep_query)
   slim :leasing_rep
+end
+
+post '/leasing_rep' do
+  month = params["Month"]
+  category = params["Category"]
+  no_of_apartment = 5
 end
 
 get '/service_req_res_rep' do   #service request resolution report
