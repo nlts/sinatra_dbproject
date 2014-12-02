@@ -13,6 +13,12 @@ require_relative('mysql')
 
 config_file 'database.yml'
 
+configure do
+  @@user = ""
+  @@apartment_number = ""
+  @@role = ""
+end
+
 
 get '/' do
   redirect to ('/login')
@@ -27,38 +33,114 @@ post '/login' do
            FROM User
            WHERE ('#{params[:username]}' = Username AND  '#{params[:password]}' = Password);"
   user = select(query)
+
   if user.empty?
     # No users retrieved with query
     redirect to('/login')
-  elsif user[0]["Username"] === params[:username]
-    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
-    redirect to('/application')
+  elsif user[0]["Role"] === "Manager" or user[0]["Role"] === "Administrator"
+    redirect to('/management')
+  elsif user[0]["Role"] === "Resident"
+    status_query = "SELECT Status FROM Resident WHERE ('#{params[:username]}' = Username)"
+    status = select(status_query)
+    if status.empty?
+      # No residents retrieved with query
+      redirect to('/login')
+    elsif status[0]["Status"] === "Prospective"
+      # "Your application is under review'"
+      slim :under_review
+    elsif status[0]["Status"] === "Approved"
+      @@user = user[0]["Username"]
+      @@role = user[0]["Role"]
+      redirect to('/home')
+    end
   else
     redirect to('/login')
   end
 end
 
 
-get '/register' do
-  slim :register
+#new resident registration and application (combined)
+
+get '/application' do
+  slim :application
 end
 
-post '/register' do
-  query = "INSERT INTO User(Username, Password, DOB, Role) VALUES
+post '/application' do
+  user_query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
+               ('#{params[:username]}',
+               '#{params[:password]}',
+               '#{params[:name]}',
+               '#{params[:dob]}',
+               '#{params[:gender]}',
+               'Resident');"
+
+  resident_query = "INSERT INTO Resident(Username, Status, Lease_term, Monthly_income, Move_in_date, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Date_of_application, Previous_address, Approved, Balance, Payment_status, Move_out_date) VALUES
           ('#{params[:username]}',
-           '#{params[:password]}',
-           '#{params[:confirm_password]}',
-           'Resident');"
-  result = insert(query)
-  if (result == 1 & (params[:password] == params[:confirm_password]))
-    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
-    redirect to('/application')
-  else
-    redirect to('/register')
+           'Prospective',
+           '#{params[:lease_term]}',
+           '#{params[:monthly_income]}',
+           '#{params[:move_in_date]}',
+           '#{params[:pref_apt_category]}',
+           '#{params[:pref_rent_range_min]}',
+           '#{params[:pref_rent_range_max]}',
+           '1994-02-02',
+           '#{params[:previous_address]}',
+           '0',
+           '0.00',
+           'Not yet approved',
+           '#{params[:move_in_date]}');"
+  user_result = insert(user_query)
+  if user_result == 1
+    resident_result = insert(resident_query)
   end
+  if user_result == 1 && resident_result == 1
+    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
+    @@user = params[:username]
+    @@dob = params[:dob]
+    @@role = 'Resident'
+    redirect to('/home')
+  else
+    # register failed - display message?
+    redirect to('/application')
+  end
+
 end
+
+# get '/register' do
+#   slim :register
+# end
+#
+# post '/register' do
+#   query = "INSERT INTO User(Username, Password, DOB, Role) VALUES
+#           ('#{params[:username]}',
+#            '#{params[:password]}',
+#            '#{params[:confirm_password]}',
+#            'Resident');"
+#   result = insert(query)
+#   if (result == 1 & (params[:password] == params[:confirm_password]))
+#     #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
+#     redirect to('/application')
+#   else
+#     redirect to('/register')
+#   end
+# end
 
 get '/home' do
+  @user = @@user
+  @role = @@role
+  apartment_query = "SELECT Apartment_num FROM Apartment A
+                     WHERE A.Tenant = '#{@user}'"
+  result = select(apartment_query)
+  @@apartment_number = result[0]["Apartment_num"]
+  @apartment_number = @@apartment_number
+
+  # check role and status
+  # get messages count
+  messages_query = "SELECT Apartment_num, COUNT(*) FROM Reminder R
+                    WHERE R.Apartment_num = '#{@apartment_number}'"
+  messages_result = select(messages_query)
+  @messages_count = messages_result[0]["COUNT(*)"]
+
   slim :home
 end
 
@@ -92,7 +174,29 @@ post '/rent' do
 end
 
 get '/maintenance_request' do
+  @date = Time.now.to_date
+  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@user}'"
+  @apartment_number = select(apartment_request)
+  @apartment_number = @apartment_number[0]["Apartment_num"]
+  issues_request = "SELECT * FROM Issue"
+  @issues = select(issues_request)
   slim :maintenance_request
+end
+
+post '/maintenance_request' do
+  @date = Time.now.to_date
+  query = "INSERT INTO Maintenance_Request(Apartment_num, Date_time_requested,
+          Date_resolved, Status, Issue_type) VALUES
+          ('#{params[:apartment_number]}',
+           NOW(),
+           NULL,
+           'Unresolved',
+           '#{params[:issue]}');"
+  result = insert(query)
+  if result == 1
+    redirect to('/home')
+  end
+
 end
 
 get '/payment_info' do
@@ -100,6 +204,11 @@ get '/payment_info' do
 end
 
 #management functionalities
+
+get '/management' do
+  slim :management
+end
+
 get '/application_review' do
   slim :application_review
 end
@@ -132,46 +241,4 @@ end
 
 
 
-
-
-#new resident registration and application (combined)
-
-
-get '/application' do
-  slim :application
-end
-
-post '/application' do
-  query = "INSERT INTO User(Username, Password, Name, DOB, Gender, Role) VALUES
-          ('#{params[:username]}',
-           '#{params[:password]}',
-           '#{params[:name]}',
-           '#{params[:dob]}',
-           '#{params[:gender]}',
-           'Resident');"
-
-  query = "INSERT INTO Resident(Name, Status, Approved, Balance, Payment_status, Move_out_date, DOB, Gender, Monthly_income, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Move_in_date, Lease_term, Previous_address) VALUES
-          ('#{params[:name]}',
-           'Pending',
-           0,
-           0.00,
-           'Pending',
-           '0000-00-00',
-           '#{params[:dob]}',
-           '#{params[:gender]}',
-           '#{params[:monthly_income]}',
-           '#{params[:pref_apt_category]}',
-           '#{params[:pref_rent_range_min]}',
-           '#{params[:pref_rent_range_max]}',
-           '#{params[:move_in_date]}',
-           '#{params[:lease_term]}',
-           '#{params[:previous_address]}'};"
-  result = insert(query)
-  if result == 1
-    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
-    redirect to('/home')
-  else
-    redirect to('/application')
-  end
-end
 

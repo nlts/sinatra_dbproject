@@ -1,19 +1,19 @@
 doctype html
 html
-  head
-    == render :slim, :'header'
-    title Register
-  body
-    div style="width:20%; min-width:300px; margin:0 auto;"
-      h1 Create account
-      form role="form" action="/register" method="POST"
-        div.form-group
-          label for="username" Username:
-          input.form-control type="text" id="username" name="username"
-        div.form-group
-          label for="password" Password:
-          input.form-control type="text" id="password" name="password"
-        div.form-group
-          label for="confirm_password" Confirm Password:
-          input.form-control type="text" id="confirm_password" name="confirm_password"
-        input.button.btn.btn-default type="submit" value="Register"
+head
+  == render :slim, :'header'
+  title Register
+body
+  div style="width:20%; min-width:300px; margin:0 auto;"
+    h1 Create account
+    form role="form" action="/register" method="POST"
+      div.form-group
+        label for="username" Username:
+        input.form-control type="text" id="username" name="username"
+      div.form-group
+        label for="password" Password:
+        input.form-control type="text" id="password" name="password"
+      div.form-group
+        label for="confirm_password" Confirm Password:
+        input.form-control type="text" id="confirm_password" name="confirm_password"
+      input.button.btn.btn-default type="submit" value="Register"

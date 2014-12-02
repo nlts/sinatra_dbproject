@@ -1,0 +1,11 @@
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Under Review
+body
+  div style="width:40%; min-width:300px; margin:0 auto;"
+    h3 Your application is under review.
+    p
+    a href="/login"
+      button.btn.btn-default Return to login
