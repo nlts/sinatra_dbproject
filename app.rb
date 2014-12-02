@@ -14,8 +14,6 @@ require_relative('mysql')
 config_file 'database.yml'
 
 
-
-
 get '/' do
   redirect to ('/login')
 end
@@ -46,7 +44,7 @@ get '/register' do
 end
 
 post '/register' do
-  query = "INSERT INTO User(Username, Password) VALUES
+  query = "INSERT INTO User(Username, Password, DOB, Role) VALUES
           ('#{params[:username]}',
            '#{params[:password]}',
            '#{params[:confirm_password]}',
@@ -65,21 +63,27 @@ get '/home' do
 end
 
 get '/application' do
-  slim :register
+  slim :application
 end
 
 post '/application' do
-  query = "INSERT INTO User(Name, DOB, Gender, Monthly_income, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Move_in_date, Lease_term, Previous_address) VALUES
+  query = "INSERT INTO User(Username, Password, DOB, Gender, Role) VALUES
+          ('#{params[:username]}',
+           '#{params[:password]}'
+           '#{params[:dob]}'
+           '#{params[:gender]}'
+           'Resident');"
+  query = "INSERT INTO Resident(Name, DOB, Gender, Monthly_income, Pref_apt_category, Pref_rent_range_min, Pref_rent_range_max, Move_in_date, Lease_term, Previous_address) VALUES
           ('#{params[:name]}',
            '#{params[:dob]}',
+           '#{params[:gender]}'
            '#{params[:monthly_income]}',
            '#{params[:pref_apt_category]}',
            '#{params[:pref_rent_range_min]}',
            '#{params[:pref_rent_range_max]}',
            '#{params[:move_in_date]}',
            '#{params[:lease_term]}',
-           '#{params[:previous_address]}',
-           'Resident');"
+           '#{params[:previous_address]}');"
   result = insert(query)
   if result == 1
     #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
@@ -87,9 +91,4 @@ post '/application' do
   else
     redirect to('/application')
   end
-end
-
-
-post '/home' do
-  query =
 end

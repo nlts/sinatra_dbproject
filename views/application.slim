@@ -7,34 +7,44 @@ html
       h1 Create account
       form role="form" action="/application" method="POST"
         div.form-group
+          label for="username" Username:
+          input.form-control type="text" id="username" name="username"
+        div.form-group
+          label for="password" Password:
+          input.form-control type="text" id="password" name="password"
 
         div.form-group
-          label for="username" Name:
+          label for="name" Name:
           input.form-control type="text" id="name" name="name"
         div.form-group
-          label for="username" DOB (YYYY-MM-DD):
+          label for="dob" DOB (YYYY-MM-DD):
           input.form-control type="text" id="dob" name="dob"
         div.form-group
-          label for="password" Gender:
+          label for="gender" Gender:
           input.form-control type="text" id="gender" name="gender"
-        input.button.btn.btn-default type="submit" value="Register"
           label for="monthly_income" Monthly Income ($):
           input.form-control type="text" id="monthly_income" name="monthly_income"
         div.form-group
           label for="pref_apt_category" Category of Apartment:
-          input.form-control type="text" id="pref_apt_category" name="pref_apt_category"
-          label for="pref_rent_range_min" Monthly Rent ($): min:
+          select
+            option value = "1bdr - 1bth" 1bdr - 1bth
+            option value = "2bdr - 1bth" 2bdr - 1bth
+            option value = "2bdr - 2bth" 2bdr - 2bth
+          label for="pref_rent_range_min" Monthly Rent ($) min:
           input.form-control type="text" id="pref_rent_range_min" name="pref_rent_range_min"
         div.form-group
-          label for="pref_rent_range_max" max:
+          label for="pref_rent_range_max" Monthly Rent ($) max:
           input.form-control type="text" id="pref_rent_range_max" name="pref_rent_range_max"
         div.form-group
           label for="move_in_date" Preferred Move in Date:
           input.form-control type="text" id="move_in_date" name="move_in_date"
         div.form-group
           label for="lease_term" Lease Term:
-          input.form-control type="text" id="lease_term" name="lease_term"
+          select
+            option value = "3 months" 3 Months
+            option value = "6 months" 6 Months
+            option value = "9 months" 9 Months
         div.form-group
           label for="previous_address" Previous Residence:
           input.form-control type="text" id="previous_address" name="previous_address"
-
+        input.button.btn.btn-default type="submit" value="Apply"
