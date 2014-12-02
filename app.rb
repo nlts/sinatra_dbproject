@@ -13,6 +13,10 @@ require_relative('mysql')
 
 config_file 'database.yml'
 
+configure do
+  @@user = ""
+end
+
 
 get '/' do
   redirect to ('/login')
@@ -153,7 +157,29 @@ post '/rent' do
 end
 
 get '/maintenance_request' do
+  @date = Time.now.to_date
+  apartment_request = "SELECT Apartment_num FROM Apartment WHERE '#{@@user}' = Tenant"
+  @apartment_number = select(apartment_request)
+  @apartment_number = @apartment_number[0]["Apartment_num"]
+  issues_request = "SELECT * FROM Issue"
+  @issues = select(issues_request)
   slim :maintenance_request
+end
+
+post '/maintenance_request' do
+  @date = Time.now.to_date
+  query = "INSERT INTO Maintenance_Request(Apartment_num, Date_time_requested,
+          Date_resolved, Status, Issue_type) VALUES
+          ('#{params[:apartment_number]}',
+           NOW(),
+           NULL,
+           'Unresolved',
+           '#{params[:issue]}');"
+  result = insert(query)
+  if result == 1
+    redirect to('/home')
+  end
+
 end
 
 get '/payment_info' do
