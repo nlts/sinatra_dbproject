@@ -31,7 +31,7 @@ end
 post '/login' do
   query = "SELECT Username, Role
            FROM User
-           WHERE ('#{params[:username]}' = Username AND  '#{params[:password]}' = Password);"
+           WHERE ('#{params[:username]}' = Username AND '#{params[:password]}' = Password);"
   user = select(query)
 
   if user.empty?
@@ -47,7 +47,7 @@ post '/login' do
       slim :under_review
     elsif status[0]["Status"] === "Rejected"
       slim :rejected
-    elsif status[0]["Status"] === "Approved"
+    elsif status[0]["Status"] === "Resident"
       @@user = user[0]["Username"]
       @@role = user[0]["Role"]
       redirect to('/home')
@@ -113,7 +113,6 @@ post '/application' do
     resident_result = insert(resident_query)
   end
   if user_result == 1 && resident_result == 1
-    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
     @@user = params[:username]
     @@dob = params[:dob]
     @@role = 'Resident'
@@ -194,11 +193,13 @@ end
 
 get '/maintenance_request' do
   @date = Time.now.to_date
-  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@user}'"
+  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@@user}'"
   @apartment_number = select(apartment_request)
   @apartment_number = @apartment_number[0]["Apartment_num"]
   issues_request = "SELECT * FROM Issue"
   @issues = select(issues_request)
+  puts @issues
+
   slim :maintenance_request
 end
 
@@ -229,21 +230,50 @@ get '/management' do
 end
 
 get '/application_review' do
+  query = "SELECT U.Username, U.Name, U.DOB, U.Gender, R.Monthly_income,
+          R.Pref_apt_category, R.Move_in_date, R.Lease_term, R.Approved
+          FROM Resident R JOIN User U ON U.Username = R.Username
+          WHERE R.Status = 'Prospective'"
+  @applications = select(query)
   slim :application_review
 end
 
-get '/apartment_allot' do
+post '/application_review' do
+  redirect to("/apartment_allot/#{params["username"]}")
+end
+
+get '/apartment_allot/:username' do
+  @username = params[:username]
+  name_query = "SELECT Name FROM User WHERE Username = '#{@username}'"
+  name = select(name_query)
+  @name = name[0]["Name"]
+  apartment_query = "SELECT A.Apartment_num, A.Date_available, A.Category, A.Square_footage, A.Rent
+                    FROM Apartment A, Resident R
+                    WHERE Tenant IS NULL
+                    AND (SELECT DATEDIFF(R.Move_in_date, A.Date_available)) <= 0
+                    AND R.Username = '#{@username}'"
+  @apartments = select(apartment_query)
   slim :apartment_allot
 end
 
+post '/apartment_allot/:username' do
+  @username = params[:username]
+  @apartment_number = params['apartment_num']
+  update_query = "UPDATE Apartment SET Tenant = '#{@username}' WHERE Apartment_num = '#{@apartment_number}'"
+  result = insert(update_query)
+  redirect to('/management')
+end
+
 get '/view_maintenance_req' do
-  unresolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type
-                    FROM Maintenance_Request
-                    WHERE Status = 'Unresolved'"
+  unresolved_query = "SELECT MONTHNAME(M.Date_time_requested) AS Month, Date_time_requested, Apartment_num, Issue_type
+                    FROM Maintenance_Request M
+                    WHERE Status = 'Unresolved'
+                    GROUP BY Month, Issue_type"
   @unresolved = select(unresolved_query)
-  resolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type, Date_resolved
-                    FROM Maintenance_Request
-                    WHERE Status = 'Resolved'"
+  resolved_query = "SELECT MONTHNAME(M.Date_time_requested) AS Month, Date_time_requested, Apartment_num, Issue_type, Date_resolved
+                    FROM Maintenance_Request M
+                    WHERE Status = 'Resolved'
+                    GROUP BY Month, Issue_type"
   @resolved = select(resolved_query)
   slim :view_maintenance_req
 end
@@ -257,22 +287,59 @@ post '/view_maintenance_req' do
    WHERE Apartment_num = '#{apartment_num}' and Date_time_requested = '#{date_time_requested}'"
   result = insert(update_query)
   redirect to('/view_maintenance_req')
-end
-
-
+end;
 
 get '/reminders' do
+  reminder_query = 'SELECT A.Apartment_num
+                    FROM Apartment A
+                    WHERE A.Tenant IS NOT NULL
+                    AND NOT EXISTS (SELECT * FROM Rent_Payment P
+                    WHERE P.Apartment_num = A.Apartment_num
+                    AND P.Month = MONTH(CURDATE())
+                    AND P.Year = YEAR(CURDATE()))'
+  @apartments = select(reminder_query)
+  puts @apartments
   slim :reminders
+end
+
+post '/reminders/:num' do
+  insert_query = "INSERT INTO Reminder (Apartment_num, Date_time, Subject, Content, Opened_status)
+                  VALUES ('#{params[:num]}',
+                          NOW(),
+                          '#{params['subject']}',
+                          '#{params['content']}',
+                          'Unopened')"
 end
 
 #reports (management only)
 
 get '/leasing_rep' do
+  leasingrep_query = "SELECT MONTHNAME(R.Move_in_date) AS Month, R.Pref_apt_category, COUNT(R.Username) AS 'No of Apartments' FROM Resident R
+    GROUP BY MONTHNAME(R.Move_in_date), R.Pref_apt_category
+    HAVING Month IN ('August', 'September', 'October')
+    ORDER BY Move_in_date;"
+  @leasingrep = select(leasingrep_query)
   slim :leasing_rep
 end
 
+post '/leasing_rep' do
+  month = params["Month"]
+  category = params["Category"]
+end
+
 get '/service_req_res_rep' do   #service request resolution report
+  servicerep_query = "SELECT MONTHNAME(Date_resolved) AS Month, Issue_type, AVG(DATEDIFF(Date_time_requested, Date_resolved)) AS 'Average No of Days'
+    FROM Maintenance_Request
+    GROUP BY Month, Issue_type
+    HAVING Month IN ('August', 'September', 'October')
+    ORDER BY Month, Issue_type;"
+  @servicerep = select(servicerep_query)
   slim :service_req_res_rep
+end
+
+post '/service_req_res_rep' do
+  month = params["Month"]
+  issue_type = params["Issue_type"]
 end
 
 get '/defaulters' do

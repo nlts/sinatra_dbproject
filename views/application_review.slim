@@ -1,0 +1,36 @@
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Application Review
+body
+  div style="width:80%; min-width:800px; margin:0 auto;margin-bottom:100px;"
+    h1 Application Review
+    form role="form" action="/application_review" method="POST"
+      - unless @applications.empty?
+        table.table.table-striped
+          thead
+            th Name
+            th Date of Birth
+            th Gender
+            th Monthly Income ($)
+            th Apartment Type
+            th Preferred Move-in Date
+            th Lease term
+            th Reject/accept
+          tbody
+          - for application in @applications do
+            tr
+              td = "#{application["Name"]}"
+              td = "#{application["DOB"]}"
+              td = "#{application["Gender"]}"
+              td = "#{application["Monthly_income"]}"
+              td = "#{application["Pref_apt_category"]}"
+              td = "#{application["Move_in_date"]}"
+              td = "#{application["Lease_term"]}"
+              td = "#{application["Approved"]}"
+              td
+                div.checkbox
+                  label
+                    input type="radio" name="username" value="#{application["Username"]}"
+      input.button.btn.btn-default style="float:right;"type="submit" value="Next"

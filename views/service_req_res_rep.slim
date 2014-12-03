@@ -1,0 +1,20 @@
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Service Request Resolution Report
+body
+  div style="width:80%; min-width:700px; margin:0 auto;"
+    h1 Service Request Resolution Report
+    - unless @servicerep.empty?
+      table.table.table-striped
+        thead
+          th Month
+          th Issue Type
+          th Average No of Days
+        tbody
+        - for result in @servicerep do
+          tr
+            td.mth = "#{result["Month"]}"
+            td.cat = "#{result["Issue Type"]}"
+            td.num = "#{result["Average No of Days"]}"
