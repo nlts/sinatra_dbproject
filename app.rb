@@ -328,7 +328,7 @@ post '/leasing_rep' do
 end
 
 get '/service_req_res_rep' do   #service request resolution report
-  servicerep_query = "SELECT MONTHNAME(Date_resolved) AS Month, Issue_type, AVG(DATEDIFF(Date_time_requested, Date_resolved)) AS 'Average No of Days'
+  servicerep_query = "SELECT MONTHNAME(Date_resolved) AS Month, Issue_type, CAST(AVG(DATEDIFF(Date_resolved, DATE(Date_time_requested))) AS UNSIGNED) AS 'Average No of Days'
     FROM Maintenance_Request
     GROUP BY Month, Issue_type
     HAVING Month IN ('August', 'September', 'October')
@@ -338,8 +338,7 @@ get '/service_req_res_rep' do   #service request resolution report
 end
 
 post '/service_req_res_rep' do
-  month = params["Month"]
-  issue_type = params["Issue_type"]
+
 end
 
 get '/defaulters' do
