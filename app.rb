@@ -192,30 +192,21 @@ post '/rent' do
            #{params["last_4_digits"]})"
 
 
-  newquery = "SET @Username = '#{@@user}';
-          SET @Apartment_num = '#{params["apartment_num"]}';
-          SET @Month = '#{params["month"]}';
-          SET @Year = '#{params["year"]}';
-          SET @Date_paid = '#{params["date_paid"]}';
-          SET @Amount_due =#{params["amount_due"]};
-          SET @CC_last_4_digits='#{params["last_4_digits"]}';
-          SET @Date_due=str_to_date(concat(@Year,@Month,'3'), '%Y%m%d');
-
-          INSERT INTO Rent_Payment (Apartment_num, Month, Year, Date_due, Amount_due, Date_paid, Username, CC_last_4_digits, Late_fee, Amount_paid)
-          VALUES (@Apartment_num, @Month, @Year, @Date_due, @Amount_due, @Date_paid, @Username, @CC_last_4_digits,
+  newquery = "INSERT INTO Rent_Payment (Apartment_num, Month, Year, Date_due, Amount_due, Date_paid, Username, CC_last_4_digits, Late_fee, Amount_paid)
+          VALUES ('#{params["apartment_num"]}', '#{params["month"]}', '#{params["year"]}', str_to_date(concat(#{params["year"]},#{params["month"]},'3'), '%Y%m%d'), #{params["amount_due"]}, '#{params["date_paid"]}', '#{@@user}', '#{params["last_4_digits"]}',
 
                   case
-                    when datediff(@Date_paid, @Date_due) > 0
-                    then datediff(@Date_paid, @Date_due) * 50
+                    when datediff('#{params["date_paid"]}', str_to_date(concat('#{params["year"]}','#{params["month"]}','3'), '%Y%m%d')) > 0
+                    then datediff('#{params["date_paid"]}', str_to_date(concat('#{params["year"]}','#{params["month"]}','3'), '%Y%m%d')) * 50
                     else 0
                   end,
                   case
-                    when exists(select 1 from Resident AS R where Month(R.Move_in_date) = @Month and Day(R.Move_in_date) > 7 and username=@Username)
-                    then (select S.Move_in_date from Resident AS S where username=@Username) - Last_Day(@Date_paid) * (@Amount_due / Day(Last_Day(@Date_paid)))
-                    else @Amount_due + Late_fee
+                    when exists(select 1 from Resident AS R where Month(R.Move_in_date) = '#{params["month"]}' and Day(R.Move_in_date) > 7 and username='#{@@user}')
+                    then (select S.Move_in_date from Resident AS S where username='#{@@user}') - Last_Day('#{params["date_paid"]}') * (#{params["amount_due"]} / Day(Last_Day('#{params["date_paid"]}')))
+                    else #{params["amount_due"]} + Late_fee
                   end
           )"
-  result = insert(query)
+  result = insert(newquery)
   redirect to('/home')
 end
 
