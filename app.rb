@@ -297,7 +297,6 @@ get '/reminders' do
                     AND P.Month = Month(CURDATE())
                     AND P.Year = YEAR(CURDATE()))'
   @apartments = select(reminder_query)
-
   slim :reminders
 end
 
@@ -313,7 +312,18 @@ end
 #reports (management only)
 
 get '/leasing_rep' do
+  leasingrep_query = "SELECT MONTHNAME(R.Move_in_date) AS Month, R.Pref_apt_category, COUNT(R.Username) AS 'No of Apartments' FROM Resident R
+    GROUP BY MONTHNAME(R.Move_in_date), R.Pref_apt_category
+    HAVING Month IN ('August', 'September', 'October')
+    ORDER BY Move_in_date;"
+  @leasingrep = select(leasingrep_query)
   slim :leasing_rep
+end
+
+post '/leasing_rep' do
+  month = params["Month"]
+  category = params["Category"]
+  no_of_apartment = 5
 end
 
 get '/service_req_res_rep' do   #service request resolution report
