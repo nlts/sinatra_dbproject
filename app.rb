@@ -113,7 +113,6 @@ post '/application' do
     resident_result = insert(resident_query)
   end
   if user_result == 1 && resident_result == 1
-    #@current_user = {username: user[0]["Username"], dob: params[:dob], role: user[0]["Role"] }
     @@user = params[:username]
     @@dob = params[:dob]
     @@role = 'Resident'
@@ -194,12 +193,14 @@ end
 
 get '/maintenance_request' do
   @date = Time.now.to_date
-  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@user}'"
+  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@@user}'"
   @apartment_number = select(apartment_request)
   @apartment_number = @apartment_number[0]["Apartment_num"]
   issues_request = "SELECT * FROM Issue"
   @issues = select(issues_request)
-  slim :view_maintenance_req
+  puts @issues
+
+  slim :maintenance_request
 end
 
 post '/maintenance_request' do
@@ -286,17 +287,16 @@ post '/view_maintenance_req' do
   redirect to('/view_maintenance_req')
 end
 
-
-
 get '/reminders' do
   reminder_query = 'SELECT A.Apartment_num
-                    FROM Apartments A
+                    FROM Apartment A
                     WHERE A.Tenant IS NOT NULL
-                    AND NOT EXISTS (SELECT Rent_Payment P
-                    WHERE P.Apartment_num = A.Apartment
-                    AND P.Month = Month(CURDATE())
+                    AND NOT EXISTS (SELECT * FROM Rent_Payment P
+                    WHERE P.Apartment_num = A.Apartment_num
+                    AND P.Month = MONTH(CURDATE())
                     AND P.Year = YEAR(CURDATE()))'
   @apartments = select(reminder_query)
+  puts @apartments
   slim :reminders
 end
 

@@ -1,0 +1,12 @@
+doctype html
+html
+  head
+    == render :slim, :'header'
+  body
+    div style="width:20%; min-width:400px; margin:0 auto;"
+  div.form-group
+    label for="pref_apt_category" Category of Apartment:
+    select name = "pref_apt_category" id = "pref_apt_category"
+      option value = "1bdr - 1bth" 1bdr - 1bth
+      option value = "2bdr - 1bth" 2bdr - 1bth
+      option value = "2bdr - 2bth" 2bdr - 2bth

@@ -1,35 +1,26 @@
 doctype html
 html
-  head
-    == render :slim, :'header'
-    title Rent
-  body
-    div style="width:20%; min-width:300px; margin:0 auto;"
-      h1 AAHP Login
-      form role="form"  action="/rent" method="POST"
-
-        div.form-group
-          label for="issue_type" Type of Request:
-            select name = "issue_type"
-              option value = "Cockroaches"
-              option value = "Hole in the Floor"
-              option value = "I've fallen and I can't get up!"
-              option value = "Get Obama off my TV!"
-              option value = "Walls are too thin"
-              option value = "Busted pipe"
-              option value = "Fridge too cold"
-              option value = "Flooded apartment"
-              option value = "Take out my trash"
-              option value = "The Rent is too Damn High!"
-              option value = "I am lonely"
-              option value = "I'm too stupid to rep"
-        div.form-group
-          label for="apartment_num" Apartment Number:
-          input.form-control type="text" id="apartment_num" name="apartment_num"
-        input.button.btn.btn-default type="submit" value="Submit Request"
-      p
-      a href="/home"
-        button.btn.btn-default Home
+head
+  == render :slim, :'header'
+  title Maintenance Request
+body
+  div style="width:20%; min-width:300px; margin:0 auto;"
+    h1 AAHP Login
+    p Date: #{@date}
+    form role="form"  action="/maintenance_request" method="POST"
+      div.form-group
+        label for="issue_type" Type of Request:
+        - unless @issues.empty?
+          select.form-control name = "issue"
+            - for issue in @issues do
+              option value="#{issue["Issue_Type"]}" #{issue["Issue_Type"]}
+      div.form-group
+        label for="apartment_num" Apartment Number:
+        input.form-control type="text" id="apartment_number" name="apartment_number" value="#{@apartment_number}"
+      input.button.btn.btn-default type="submit" value="Submit Request"
+    p
+    a href="/home"
+      button.btn.btn-default Home
 
 
 
