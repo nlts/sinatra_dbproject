@@ -246,6 +246,31 @@ post '/delete_card' do
   result = insert(delete)
   redirect to('/payment_info')
 end
+
+get '/messages' do
+  # Read most recent message
+  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@@user}'"
+  @apartment_number = select(apartment_request)
+  @apartment_number = @apartment_number[0]["Apartment_num"]
+  read_query = "SELECT Subject, Content, Date_time
+               FROM Reminder WHERE Apartment_num = #{@apartment_number}
+               AND Opened_status = 'Unopened'"
+  @message = select(read_query)
+  slim :read_reminder
+end
+
+post '/messages' do
+  apartment_request ="SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@@user}'"
+  @apartment_number = select(apartment_request)
+  @apartment_number = @apartment_number[0]["Apartment_num"]
+  update_query = "UPDATE Reminder
+                 SET Opened_status='Opened'
+                 WHERE Apartment_num = #{@apartment_number} AND Opened_status = 'Unopened'"
+  result = insert(update_query)
+  redirect to('/home')
+end
+
+
 #management functionalities
 
 get '/management' do

@@ -1,0 +1,13 @@
+doctype html
+html
+  head
+    == render :slim, :'header'
+  body
+    div style="width:20%; min-width:400px; margin:0 auto;"
+      h1 Messages
+      - unless @message.empty?
+          h4 #{@message[0]["Subject"]}
+          p #{@message[0]["Content"]}
+          p Date: #{@message[0]["Date_time"]}
+          form role="form" action="/messages" method="POST"
+            input.button.btn.btn-default type="submit" value="OK"
