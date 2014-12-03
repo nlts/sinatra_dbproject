@@ -31,7 +31,7 @@ end
 post '/login' do
   query = "SELECT Username, Role
            FROM User
-           WHERE ('#{params[:username]}' = Username AND  '#{params[:password]}' = Password);"
+           WHERE ('#{params[:username]}' = Username AND '#{params[:password]}' = Password);"
   user = select(query)
 
   if user.empty?
@@ -47,7 +47,7 @@ post '/login' do
       slim :under_review
     elsif status[0]["Status"] === "Rejected"
       slim :rejected
-    elsif status[0]["Status"] === "Approved"
+    elsif status[0]["Status"] === "Resident"
       @@user = user[0]["Username"]
       @@role = user[0]["Role"]
       redirect to('/home')
@@ -199,7 +199,7 @@ get '/maintenance_request' do
   @apartment_number = @apartment_number[0]["Apartment_num"]
   issues_request = "SELECT * FROM Issue"
   @issues = select(issues_request)
-  slim :maintenance_request
+  slim :view_maintenance_req
 end
 
 post '/maintenance_request' do
@@ -289,7 +289,25 @@ end
 
 
 get '/reminders' do
+  reminder_query = 'SELECT A.Apartment_num
+                    FROM Apartments A
+                    WHERE A.Tenant IS NOT NULL
+                    AND NOT EXISTS (SELECT Rent_Payment P
+                    WHERE P.Apartment_num = A.Apartment
+                    AND P.Month = Month(CURDATE())
+                    AND P.Year = YEAR(CURDATE()))'
+  @apartments = select(reminder_query)
+
   slim :reminders
+end
+
+post '/reminders/:num' do
+  insert_query = "INSERT INTO Reminder (Apartment_num, Date_time, Subject, Content, Opened_status)
+                  VALUES ('#{params[:num]}',
+                          NOW(),
+                          '#{params['subject']}',
+                          '#{params['content']}',
+                          'Unopened')"
 end
 
 #reports (management only)
