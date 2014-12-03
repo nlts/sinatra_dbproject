@@ -94,15 +94,15 @@ post '/application' do
                    Payment_status, Move_out_date) VALUES ('#{params[:username]}', 'Prospective',
                    '#{params[:lease_term]}', '#{params[:monthly_income]}', '#{params[:move_in_date]}',
                    '#{params[:pref_apt_category]}', '#{params[:pref_rent_range_min]}', '#{params[:pref_rent_range_max]}', CURDATE(), '#{params[:previous_address]}',
-                   (CASE WHEN Move_in_date > CURDATE()+60
+                   (CASE WHEN '#{params[:move_in_date]}' > CURDATE()+ INTERVAL 2 MONTH
                    THEN 'Rejected'
                    WHEN EXISTS(SELECT 1 FROM Apartment
                    WHERE Apartment.Category = '#{params[:pref_apt_category]}'
                    and Apartment.Date_available > '#{params[:move_in_date]}')
-                   and 6000 > (SELECT Apartment.Rent FROM Apartment
+                   and '#{params[:monthly_income]}' > (SELECT Apartment.Rent FROM Apartment
                    WHERE Apartment.Category = '#{params[:pref_apt_category]}'
                    and Apartment.Date_available > '#{params[:move_in_date]}'
-                   ORDER BY Apartment.Rent ASC Limit 1) THEN 'Approved'
+                   ORDER BY Apartment.Rent ASC Limit 1) * 3 THEN 'Approved'
                    ELSE 'Rejected'
                    END),
                    0.00,
