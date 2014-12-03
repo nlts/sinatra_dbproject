@@ -8,23 +8,23 @@ html
       h1 Rent Payment
       form role="form"  action="/rent" method="POST"
         div.form-group
-          label for="date" Date:
-          input.form-control type="text" id="date" name="date"
+          label for="date" Date due:
+          input.form-control type="date_due" id="date_due" name="date_due"
         div.form-group
           label for="month" Rent for Month:
           select.form-control name = "month" id = "month"
-            option value = "January" January
-            option value = "February" February
-            option value = "March" March
-            option value = "April" April
-            option value = "May" May
-            option value = "June" June
-            option value = "July" July
-            option value = "August" August
-            option value = "September" September
-            option value = "October" October
-            option value = "November" November
-            option value = "December" December
+            option value = "1" January
+            option value = "2" February
+            option value = "3" March
+            option value = "4" April
+            option value = "5" May
+            option value = "6" June
+            option value = "7" July
+            option value = "8" August
+            option value = "9" September
+            option value = "10" October
+            option value = "11" November
+            option value = "12" December
           label for="year" Rent for Year:
           select.form-control name = "year" id = "year"
             option value = "2012" 2012
@@ -33,14 +33,16 @@ html
             option value = "2015" 2015
         div.form-group
           label for="apartment_num" Apartment Number:
-          input.form-control type="text" id="apartment_num" name="apartment_num"
+          input.form-control type="text" id="apartment_num" name="apartment_num" value="#{@apartment_number}"
         div.form-group
           label for="amount_due" Amount Due:
           input.form-control type="text" id="amt_due" name="amt_due"
         div.form-group
           label for="cc_last_4_digits" Use Card:
-          select name = "cc_last_4_digits"
-          input.form-control type="text" id="cc_last_4_digits" name="cc_last_4_digits"
+          - unless @last4.empty?
+            select.form-control name="last_4_digits"
+              - for item in @last4 do
+                option value="#{item["Last_4_digits"]}" #{item["Last_4_digits"]}
         input.button.btn.btn-default type="submit" value="Pay"
       p
       a href="/home"

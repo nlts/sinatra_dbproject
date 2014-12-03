@@ -168,19 +168,25 @@ end
 
 #resident functionalities
 get '/rent' do
+  apartment_query = "SELECT Apartment_num FROM Apartment A WHERE A.Tenant = '#{@@user}'"
+  @apartment_number = select(apartment_query)
+  @apartment_number = @apartment_number[0]["Apartment_num"]
+  last_4_query = "SELECT Last_4_digits FROM Credit_Card WHERE Username = '#{@@user}'"
+  @last4 = select(last_4_query)
   slim :rent
 end
 
 post '/rent' do
-  query = "INSERT INTO Rent_Payment(Apartment_num, Month, Year, Date_due, Amount_due, Late_fee, Date_paid, Amount_paid, Username, CC_last_4_digits) VALUES
+  query = "INSERT INTO Rent_Payment(Apartment_num, Month, Year, Date_due, Amount_due,
+          Late_fee, Date_paid, Amount_paid, Username, CC_last_4_digits) VALUES
           ('#{params[:apartment_num]}',
            '#{params[:month]}',
            '#{params[:year]}',
            '#{params[:date_due]}',
-           '#{params[:amount_due]}',
+           CAST('#{params[:amount_due]}' AS DECIMAL(10, 4)),
            '#{params[:late_fee]}',
-           '#{params[:date_paid]}',
-           '#{params[:amount_paid]}',
+           CURDATE(),
+           CAST('#{params[:amount_due]}' AS DECIMAL(10, 4)),
            '#{params[:username]}',
            '#{params[:cc_last_4_digits]}');"
   result = insert(query)
@@ -235,8 +241,8 @@ post '/new_card' do
 end
 
 post '/delete_card' do
-  delete = "DELETE * FROM Credit_Card WHERE Username = '#{@@user}'
-            AND Last_4_digit = '#{params["last_4_digits"]}'"
+  delete = "DELETE FROM Credit_Card WHERE Username = '#{@@user}'
+            AND Last_4_digits = '#{params["last_4_digits"]}'"
   result = insert(delete)
   redirect to('/payment_info')
 end
