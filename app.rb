@@ -316,9 +316,7 @@ get '/leasing_rep' do
     GROUP BY MONTHNAME(R.Move_in_date), R.Pref_apt_category
     HAVING Month IN ('August', 'September', 'October')
     ORDER BY Move_in_date;"
-  result = select(leasingrep_query)
-  @leasingrep = result
-  puts @leasingrep[0]["Month"]
+  @leasingrep = select(leasingrep_query)
   slim :leasing_rep
 end
 
