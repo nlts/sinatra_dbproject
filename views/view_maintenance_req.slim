@@ -37,7 +37,7 @@ body
           th Apartment number
           th Issue type
           th Date Resolved
-          th Avg No of Days
+
         tbody
         - for request in @resolved do
           tr
@@ -46,7 +46,7 @@ body
             td.aptnum = "#{request["Apartment_num"]}"
             td.type = "#{request["Issue_type"]}"
             td.end = "#{request["Date_resolved"]}"
-            td.avg = "#{request["Avg No of Days]}"
+
 
       p
         a href="/management"
