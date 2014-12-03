@@ -27,7 +27,7 @@ body
                   label
                     input type="radio" name="Date_time_requested" value="#{request["Date_time_requested"]}"
                     input type="hidden" name="Apartment_num" value="#{request["Apartment_num"]}"
-      input.button.btn.btn-default type="submit" value="Mark resolved"
+        input.button.btn.btn-default type="submit" value="Mark resolved"
     h3 Resolved requests
     - unless @resolved.empty?
       table.table.table-striped
@@ -48,6 +48,6 @@ body
             td.end = "#{request["Date_resolved"]}"
             td.avg = "#{request["Avg No of Days]}"
 
-        p
-          a href="/leasing_rep"
-            button.btn.btn-default Leasing report
+      p
+        a href="/management"
+          button.btn.btn-default Back to Management
