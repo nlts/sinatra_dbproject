@@ -155,7 +155,8 @@ get '/home' do
   # check role and status
   # get messages count
   messages_query = "SELECT Apartment_num, COUNT(*) FROM Reminder R
-                    WHERE R.Apartment_num = '#{@apartment_number}'"
+                    WHERE R.Apartment_num = '#{@apartment_number}'
+                    AND R.Opened_status = 'Unopened'"
   messages_result = select(messages_query)
   @messages_count = messages_result[0]["COUNT(*)"]
 
@@ -179,22 +180,18 @@ end
 post '/rent' do
   query = "INSERT INTO Rent_Payment(Apartment_num, Month, Year, Date_due, Amount_due,
           Late_fee, Date_paid, Amount_paid, Username, CC_last_4_digits) VALUES
-          ('#{params[:apartment_num]}',
-           '#{params[:month]}',
-           '#{params[:year]}',
-           '#{params[:date_due]}',
-           CAST('#{params[:amount_due]}' AS DECIMAL(10, 4)),
-           '#{params[:late_fee]}',
+          ('#{params["apartment_num"]}',
+           '#{params["month"]}',
+           '#{params["year"]}',
+           '#{params["date_due"]}',
+           #{params["amount_due"]},
+           #{params["late_fee"]},
            CURDATE(),
-           CAST('#{params[:amount_due]}' AS DECIMAL(10, 4)),
-           '#{params[:username]}',
-           '#{params[:cc_last_4_digits]}');"
+           #{params["amount_due"]},
+           '#{@@user}',
+           #{params["last_4_digits"]})"
   result = insert(query)
-  if result == 1
-    redirect to {'/home'}
-  else
-    redirect to {'/rent'}
-  end
+  redirect to('/home')
 end
 
 get '/maintenance_request' do

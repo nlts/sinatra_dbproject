@@ -35,10 +35,13 @@ html
           label for="apartment_num" Apartment Number:
           input.form-control type="text" id="apartment_num" name="apartment_num" value="#{@apartment_number}"
         div.form-group
-          label for="amount_due" Amount Due:
-          input.form-control type="text" id="amt_due" name="amt_due"
+          label for="late_fee" Late fee:
+          input.form-control type="text" id="late_fee" name="late_fee"
         div.form-group
-          label for="cc_last_4_digits" Use Card:
+            label for="amount_due" Amount Due:
+            input.form-control type="text" id="amount_due" name="amount_due"
+        div.form-group
+          label for="last_4_digits" Use Card:
           - unless @last4.empty?
             select.form-control name="last_4_digits"
               - for item in @last4 do
