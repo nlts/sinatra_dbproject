@@ -5,33 +5,32 @@ html
     title Rent
   body
     div style="width:20%; min-width:300px; margin:0 auto;"
-      h1 AAHP Login
+      h1 Rent Payment
       form role="form"  action="/rent" method="POST"
         div.form-group
           label for="date" Date:
           input.form-control type="text" id="date" name="date"
         div.form-group
           label for="month" Rent for Month:
-            select name = "month" id = "month"
-              option value = "January" January
-              option value = "February" February
-              option value = "March" March
-              option value = "April" April
-              option value = "May" May
-              option value = "June" June
-              option value = "July" July
-              option value = "August" August
-              option value = "September" September
-              option value = "October" October
-              option value = "November" November
-              option value = "December" December
-
+          select.form-control name = "month" id = "month"
+            option value = "January" January
+            option value = "February" February
+            option value = "March" March
+            option value = "April" April
+            option value = "May" May
+            option value = "June" June
+            option value = "July" July
+            option value = "August" August
+            option value = "September" September
+            option value = "October" October
+            option value = "November" November
+            option value = "December" December
           label for="year" Rent for Year:
-            select name = "year" id = "year"
-              option value = "2012" 2012
-              option value = "2013" 2013
-              option value = "2014" 2014
-              option value = "2015" 2015
+          select.form-control name = "year" id = "year"
+            option value = "2012" 2012
+            option value = "2013" 2013
+            option value = "2014" 2014
+            option value = "2015" 2015
         div.form-group
           label for="apartment_num" Apartment Number:
           input.form-control type="text" id="apartment_num" name="apartment_num"

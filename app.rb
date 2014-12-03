@@ -220,9 +220,26 @@ post '/maintenance_request' do
 end
 
 get '/payment_info' do
+  last_4_query = "SELECT Last_4_digits FROM Credit_Card WHERE Username = '#{@@user}'"
+  @last4 = select(last_4_query)
   slim :payment_info
 end
 
+post '/new_card' do
+  new_query = "INSERT INTO Credit_Card(Username, Last_4_digits, Name_on_Card, Card_number, Expiration_Date, CVV)
+               VALUES ('#{@@user}', '#{params["last_4_digits"]}',
+              '#{params["name_on_card"]}', '#{params["card_number"]}',
+              '#{params["expiration_date"]}', '#{params["cvv"]}')"
+  result = insert(new_query)
+  redirect to('/home')
+end
+
+post '/delete_card' do
+  delete = "DELETE * FROM Credit_Card WHERE Username = '#{@@user}'
+            AND Last_4_digit = '#{params["last_4_digits"]}'"
+  result = insert(delete)
+  redirect to('/payment_info')
+end
 #management functionalities
 
 get '/management' do
@@ -297,18 +314,21 @@ get '/reminders' do
                     WHERE P.Apartment_num = A.Apartment_num
                     AND P.Month = MONTH(CURDATE())
                     AND P.Year = YEAR(CURDATE()))'
+  @date = Time.now.to_date
   @apartments = select(reminder_query)
   puts @apartments
   slim :reminders
 end
 
-post '/reminders/:num' do
+post '/reminders' do
   insert_query = "INSERT INTO Reminder (Apartment_num, Date_time, Subject, Content, Opened_status)
-                  VALUES ('#{params[:num]}',
+                  VALUES ('#{params['apartment_number']}',
                           NOW(),
-                          '#{params['subject']}',
+                          'Late Rent',
                           '#{params['content']}',
                           'Unopened')"
+  result = insert(insert_query)
+  redirect to('/management')
 end
 
 #reports (management only)
