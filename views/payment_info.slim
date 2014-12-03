@@ -5,41 +5,32 @@ html
     title Rent
   body
     div style="width:20%; min-width:300px; margin:0 auto;"
-      h1 AAHP Login
-      form role="form"  action="/rent" method="POST"
+      h1 Payment info
+      form role="form"  action="/new_card" method="POST"
         div.form-group
-          label for="date" Date:
-          input.form-control type="text" id="date" name="date"
+          label for="card_number" Card Number:
+          input.form-control type="text" id="card_number" name="card_number"
         div.form-group
-          label for="month" Rent for Month:
-            select name = "month"
-              option value = "January"
-              option value = "February"
-              option value = "March"
-              option value = "April"
-              option value = "May"
-              option value = "June"
-              option value = "July"
-              option value = "August"
-              option value = "September"
-              option value = "October"
-              option value = "November"
-              option value = "December"
-            select name = "year"
-              option value = "2012"
-              option value = "2013"
-              option value = "2014"
-              option value = "2015"
+          label for="last_4_digits" Last 4 digits:
+          input.form-control type="text" id="last_4_digits" name="last_4_digits"
         div.form-group
-          label for="apartment_num" Apartment Number:
-          input.form-control type="text" id="apartment_num" name="apartment_num"
+          label for="cvv" CVV:
+          input.form-control type="text" id="cvv" name="cvv"
         div.form-group
-          label for="amount_due" Amount Due:
-          input.form-control type="text" id="amt_due" name="amt_due"
+          label for="name_on_card" Name on card:
+          input.form-control type="name_on_card" id="name_on_card" name="name_on_card"
         div.form-group
-          label for="cc_last_4_digits" Use Card:
-          select name = "cc_last_4_digits"
-        input.button.btn.btn-default type="submit" value="Pay"
+          label for="expiration_date" Expiration date (YYYY-MM-DD):
+          input.form-control type="expiration_date" id="expiration_date" name="expiration_date"
+        input.button.btn.btn-default type="submit" value="Add card"
+      p
+      form role="form" action="/delete_card" method="POST"
+        div.form-group
+        - unless @last4.empty?
+          select.form-control name="last_4_digits"
+            - for item in @last4 do
+              option value="#{item["Last_4_digits"]}" #{item["Last_4_digits"]}
+        input.button.btn.btn-default type="submit" value="Delete card"
       p
       a href="/home"
         button.btn.btn-default Home

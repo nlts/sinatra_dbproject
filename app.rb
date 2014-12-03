@@ -220,9 +220,26 @@ post '/maintenance_request' do
 end
 
 get '/payment_info' do
+  last_4_query = "SELECT Last_4_digits FROM Credit_Card WHERE Username = '#{@@user}'"
+  @last4 = select(last_4_query)
   slim :payment_info
 end
 
+post '/new_card' do
+  new_query = "INSERT INTO Credit_Card(Username, Last_4_digits, Name_on_Card, Card_number, Expiration_Date, CVV)
+               VALUES ('#{@@user}', '#{params["last_4_digits"]}',
+              '#{params["name_on_card"]}', '#{params["card_number"]}',
+              '#{params["expiration_date"]}', '#{params["cvv"]}')"
+  result = insert(new_query)
+  redirect to('/home')
+end
+
+post '/delete_card' do
+  delete = "DELETE * FROM Credit_Card WHERE Username = '#{@@user}'
+            AND Last_4_digit = '#{params["last_4_digits"]}'"
+  result = insert(delete)
+  redirect to('/payment_info')
+end
 #management functionalities
 
 get '/management' do
