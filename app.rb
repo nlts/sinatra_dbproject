@@ -295,18 +295,21 @@ get '/reminders' do
                     WHERE P.Apartment_num = A.Apartment_num
                     AND P.Month = MONTH(CURDATE())
                     AND P.Year = YEAR(CURDATE()))'
+  @date = Time.now.to_date
   @apartments = select(reminder_query)
   puts @apartments
   slim :reminders
 end
 
-post '/reminders/:num' do
+post '/reminders' do
   insert_query = "INSERT INTO Reminder (Apartment_num, Date_time, Subject, Content, Opened_status)
-                  VALUES ('#{params[:num]}',
+                  VALUES ('#{params['apartment_number']}',
                           NOW(),
-                          '#{params['subject']}',
+                          'Late Rent',
                           '#{params['content']}',
                           'Unopened')"
+  result = insert(insert_query)
+  redirect to('/management')
 end
 
 #reports (management only)
