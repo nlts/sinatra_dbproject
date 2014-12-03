@@ -1,6 +1,7 @@
 sinatra_dbproject
 =================
 
-Requires JRuby
+CS 4400 Project
+Matt Townsend, James Willis, Wesley Schon, Anthony Lovence
 
-Run with "bundle install" and "ruby app.rb"
+Requires JRuby. Run with "bundle install" and "jruby app.rb".

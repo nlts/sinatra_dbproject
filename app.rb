@@ -319,8 +319,7 @@ get '/apartment_allot/:username' do
   @name = name[0]["Name"]
   apartment_query = "SELECT A.Apartment_num, A.Date_available, A.Category, A.Square_footage, A.Rent
                     FROM Apartment A, Resident R
-                    WHERE Tenant IS NULL
-                    AND (SELECT DATEDIFF(R.Move_in_date, A.Date_available)) <= 0
+                    WHERE A.Tenant IS NULL
                     AND R.Username = '#{@username}'"
   @apartments = select(apartment_query)
   slim :apartment_allot
