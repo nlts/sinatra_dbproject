@@ -265,13 +265,15 @@ post '/apartment_allot/:username' do
 end
 
 get '/view_maintenance_req' do
-  unresolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type
-                    FROM Maintenance_Request
-                    WHERE Status = 'Unresolved'"
+  unresolved_query = "SELECT MONTHNAME(M.Date_time_requested) AS Month, Date_time_requested, Apartment_num, Issue_type
+                    FROM Maintenance_Request M
+                    WHERE Status = 'Unresolved'
+                    GROUP BY Month, Issue_type"
   @unresolved = select(unresolved_query)
-  resolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type, Date_resolved
-                    FROM Maintenance_Request
-                    WHERE Status = 'Resolved'"
+  resolved_query = "SELECT MONTHNAME(M.Date_time_requested) AS Month, Date_time_requested, Apartment_num, Issue_type, Date_resolved
+                    FROM Maintenance_Request M
+                    WHERE Status = 'Resolved'
+                    GROUP BY Month, Issue_type"
   @resolved = select(resolved_query)
   slim :view_maintenance_req
 end
@@ -285,7 +287,7 @@ post '/view_maintenance_req' do
    WHERE Apartment_num = '#{apartment_num}' and Date_time_requested = '#{date_time_requested}'"
   result = insert(update_query)
   redirect to('/view_maintenance_req')
-end
+end;
 
 get '/reminders' do
   reminder_query = 'SELECT A.Apartment_num
@@ -326,11 +328,21 @@ end
 post '/leasing_rep' do
   month = params["Month"]
   category = params["Category"]
-  no_of_apartment = 5
 end
 
 get '/service_req_res_rep' do   #service request resolution report
+  servicerep_query = "SELECT MONTHNAME(Date_resolved) AS Month, Issue_type, AVG(DATEDIFF(Date_time_requested, Date_resolved)) AS 'Average No of Days'
+    FROM Maintenance_Request
+    GROUP BY Month, Issue_type
+    HAVING Month IN ('August', 'September', 'October')
+    ORDER BY Month, Issue_type;"
+  @servicerep = select(servicerep_query)
   slim :service_req_res_rep
+end
+
+post '/service_req_res_rep' do
+  month = params["Month"]
+  issue_type = params["Issue_type"]
 end
 
 get '/defaulters' do

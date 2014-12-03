@@ -10,6 +10,7 @@ body
       - unless @unresolved.empty?
         table.table.table-striped
           thead
+            th Month
             th Time requested
             th Apartment number
             th Issue type
@@ -17,6 +18,7 @@ body
           tbody
           - for request in @unresolved do
             tr
+              td.req = "#{request["Month"]}"
               td.req = "#{request["Date_time_requested"]}"
               td.aptnum = "#{request["Apartment_num"]}"
               td.type = "#{request["Issue_type"]}"
@@ -30,17 +32,21 @@ body
     - unless @resolved.empty?
       table.table.table-striped
         thead
+          th Month
           th Time requested
           th Apartment number
           th Issue type
           th Date Resolved
+
         tbody
         - for request in @resolved do
           tr
+            td.req = "#{request["Month"]}"
             td.req = "#{request["Date_time_requested"]}"
             td.aptnum = "#{request["Apartment_num"]}"
             td.type = "#{request["Issue_type"]}"
             td.end = "#{request["Date_resolved"]}"
+
 
       p
         a href="/management"
