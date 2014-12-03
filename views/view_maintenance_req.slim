@@ -33,7 +33,7 @@ body
           th Time requested
           th Apartment number
           th Issue type
-          th Checkbox
+          th Date Resolved
         tbody
         - for request in @resolved do
           tr
@@ -41,3 +41,7 @@ body
             td.aptnum = "#{request["Apartment_num"]}"
             td.type = "#{request["Issue_type"]}"
             td.end = "#{request["Date_resolved"]}"
+
+        p
+          a href="/leasing_rep"
+            button.btn.btn-default Leasing report
