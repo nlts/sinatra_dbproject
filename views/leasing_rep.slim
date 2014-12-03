@@ -6,15 +6,15 @@ head
 body
   div style="width:80%; min-width:700px; margin:0 auto;"
     h1 Leasing Report
-
+    - unless @leasingrep.empty?
       table.table.table-striped
         thead
           th Month
           th Category
           th No. of Apartments
         tbody
-        - for leasingrep in @leasingrep do
+        - for result in @leasingrep do
           tr
-            td.mth = "#{leasingrep["Month"]}"
-            td.cat = "#{leasingrep["Pref_apt_category"]}"
-            td.num = "#{leasingrep["No of Apartments"]}"
+            td.mth = "#{result["Month"]}"
+            td.cat = "#{result["Pref_apt_category"]}"
+            td.num = "#{result["No of Apartments"]}"
