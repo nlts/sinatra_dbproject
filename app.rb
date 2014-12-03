@@ -297,9 +297,9 @@ end
 
 get '/leasing_rep' do
   leasingrep_query = "SELECT MONTHNAME(R.Move_in_date) AS Month, R.Pref_apt_category, COUNT(R.Username) AS 'No of Apartments' FROM Resident R
-      WHERE Month IN ('August', 'September', 'October')
-      GROUP BY Month, R.Pref_apt_category
-      ORDER BY Month, R.Pref_apt_category"
+    GROUP BY MONTHNAME(R.Move_in_date), R.Pref_apt_category
+    HAVING Month IN ('August', 'September', 'October')
+    ORDER BY Move_in_date;"
   @leasingrep = select(leasingrep_query)
   slim :leasing_rep
 end
