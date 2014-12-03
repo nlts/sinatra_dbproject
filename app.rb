@@ -229,11 +229,38 @@ get '/management' do
 end
 
 get '/application_review' do
+  query = "SELECT U.Username, U.Name, U.DOB, U.Gender, R.Monthly_income,
+          R.Pref_apt_category, R.Move_in_date, R.Lease_term, R.Approved
+          FROM Resident R JOIN User U ON U.Username = R.Username
+          WHERE R.Status = 'Prospective'"
+  @applications = select(query)
   slim :application_review
 end
 
-get '/apartment_allot' do
+post '/application_review' do
+  redirect to("/apartment_allot/#{params["username"]}")
+end
+
+get '/apartment_allot/:username' do
+  @username = params[:username]
+  name_query = "SELECT Name FROM User WHERE Username = '#{@username}'"
+  name = select(name_query)
+  @name = name[0]["Name"]
+  apartment_query = "SELECT A.Apartment_num, A.Date_available, A.Category, A.Square_footage, A.Rent
+                    FROM Apartment A, Resident R
+                    WHERE Tenant IS NULL
+                    AND (SELECT DATEDIFF(R.Move_in_date, A.Date_available)) <= 0
+                    AND R.Username = '#{@username}'"
+  @apartments = select(apartment_query)
   slim :apartment_allot
+end
+
+post '/apartment_allot/:username' do
+  @username = params[:username]
+  @apartment_number = params['apartment_num']
+  update_query = "UPDATE Apartment SET Tenant = '#{@username}' WHERE Apartment_num = '#{@apartment_number}'"
+  result = insert(update_query)
+  redirect to('/management')
 end
 
 get '/view_maintenance_req' do
