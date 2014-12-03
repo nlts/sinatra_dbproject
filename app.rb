@@ -190,6 +190,31 @@ post '/rent' do
            #{params["amount_due"]},
            '#{@@user}',
            #{params["last_4_digits"]})"
+
+
+  newquery = "SET @Username = '#{@@user}';
+          SET @Apartment_num = '#{params["apartment_num"]}';
+          SET @Month = '#{params["month"]}';
+          SET @Year = '#{params["year"]}';
+          SET @Date_paid = '#{params["date_paid"]}';
+          SET @Amount_due =#{params["amount_due"]};
+          SET @CC_last_4_digits='#{params["last_4_digits"]}';
+          SET @Date_due=str_to_date(concat(@Year,@Month,'3'), '%Y%m%d');
+
+          INSERT INTO Rent_Payment (Apartment_num, Month, Year, Date_due, Amount_due, Date_paid, Username, CC_last_4_digits, Late_fee, Amount_paid)
+          VALUES (@Apartment_num, @Month, @Year, @Date_due, @Amount_due, @Date_paid, @Username, @CC_last_4_digits,
+
+                  case
+                    when datediff(@Date_paid, @Date_due) > 0
+                    then datediff(@Date_paid, @Date_due) * 50
+                    else 0
+                  end,
+                  case
+                    when exists(select 1 from Resident AS R where Month(R.Move_in_date) = @Month and Day(R.Move_in_date) > 7 and username=@Username)
+                    then (select S.Move_in_date from Resident AS S where username=@Username) - Last_Day(@Date_paid) * (@Amount_due / Day(Last_Day(@Date_paid)))
+                    else @Amount_due + Late_fee
+                  end
+          )"
   result = insert(query)
   redirect to('/home')
 end
@@ -389,10 +414,22 @@ post '/service_req_res_rep' do
 
 end
 
-get '/defaulters' do
+get '/defaulters/:month' do
+  month = params[:month]
+  defaulters_query = "SELECT Apartment_num
+                    AS 'Apartment',
+                    Late_fee,
+                    (Date_paid-Date_due) AS 'Defaulted By'
+                    FROM Rent_Payment
+                    WHERE Late_fee > 0
+                    AND Month = '#{month}'"
+  @defaulters = select(defaulters_query)
+  puts @defaulters
   slim :defaulters
 end
 
-
+post '/defaulters' do
+  redirect to("/defaulters/#{params["month"]}")
+end
 
 

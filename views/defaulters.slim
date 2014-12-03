@@ -1,0 +1,37 @@
+doctype html
+html
+head
+  == render :slim, :'header'
+  title Rent Defaulter Report
+body
+  div style="width:40%; min-width:400px; margin:0 auto;"
+    h1 Leasing Report
+    - unless @defaulters.empty?
+      table.table.table-striped
+        thead
+          th Apartment Number
+          th Extra Amount Paid (?)
+          th Defaulted By
+        tbody
+        - for result in @defaulters do
+          tr
+            td.num = "#{result["Apartment_num"]}"
+            td.num = "#{result["Late_fee"].to_f}"
+            td.num = "#{result["Defaulted By"]}"
+    form role="form"  action="/defaulters" method="POST"
+      div.form-group
+        label for="month" Select month:
+        select.form-control name = "month" id = "month"
+          option value = "1" January
+          option value = "2" February
+          option value = "3" March
+          option value = "4" April
+          option value = "5" May
+          option value = "6" June
+          option value = "7" July
+          option value = "8" August
+          option value = "9" September
+          option value = "10" October
+          option value = "11" November
+          option value = "12" December
+      input.button.btn.btn-default type="submit" value="Query"
