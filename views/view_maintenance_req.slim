@@ -10,6 +10,7 @@ body
       - unless @unresolved.empty?
         table.table.table-striped
           thead
+            th Month
             th Time requested
             th Apartment number
             th Issue type
@@ -17,6 +18,7 @@ body
           tbody
           - for request in @unresolved do
             tr
+              td.req = "#{request["Month"]}"
               td.req = "#{request["Date_time_requested"]}"
               td.aptnum = "#{request["Apartment_num"]}"
               td.type = "#{request["Issue_type"]}"
@@ -30,17 +32,21 @@ body
     - unless @resolved.empty?
       table.table.table-striped
         thead
+          th Month
           th Time requested
           th Apartment number
           th Issue type
           th Date Resolved
+          th Avg No of Days
         tbody
         - for request in @resolved do
           tr
+            td.req = "#{request["Month"]}"
             td.req = "#{request["Date_time_requested"]}"
             td.aptnum = "#{request["Apartment_num"]}"
             td.type = "#{request["Issue_type"]}"
             td.end = "#{request["Date_resolved"]}"
+            td.avg = "#{request["Avg No of Days]}"
 
         p
           a href="/leasing_rep"

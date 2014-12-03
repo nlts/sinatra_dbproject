@@ -47,7 +47,7 @@ post '/login' do
       slim :under_review
     elsif status[0]["Status"] === "Rejected"
       slim :rejected
-    elsif status[0]["Status"] === "Approved"
+    elsif status[0]["Status"] === "Resident"
       @@user = user[0]["Username"]
       @@role = user[0]["Role"]
       redirect to('/home')
@@ -264,13 +264,15 @@ post '/apartment_allot/:username' do
 end
 
 get '/view_maintenance_req' do
-  unresolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type
-                    FROM Maintenance_Request
-                    WHERE Status = 'Unresolved'"
+  unresolved_query = "SELECT MONTHNAME(M.Date_time_requested) AS Month, Date_time_requested, Apartment_num, Issue_type, AVG(DATEDIFF(Date_time_requested, Date_resolved)) AS 'Average No of Days'
+                    FROM Maintenance_Request M
+                    WHERE Status = 'Unresolved'
+                    GROUP BY Month, Issue_type"
   @unresolved = select(unresolved_query)
-  resolved_query = "SELECT Date_time_requested, Apartment_num, Issue_type, Date_resolved
-                    FROM Maintenance_Request
-                    WHERE Status = 'Resolved'"
+  resolved_query = "SELECT MONTHNAME(M.Date_time_requested) AS Month, Date_time_requested, Apartment_num, Issue_type, Date_resolved, AVG(DATEDIFF(Date_time_requested, Date_resolved)) AS 'Average No of Days'
+                    FROM Maintenance_Request M
+                    WHERE Status = 'Resolved'
+                    GROUP BY Month, Issue_type"
   @resolved = select(resolved_query)
   slim :view_maintenance_req
 end
@@ -284,7 +286,7 @@ post '/view_maintenance_req' do
    WHERE Apartment_num = '#{apartment_num}' and Date_time_requested = '#{date_time_requested}'"
   result = insert(update_query)
   redirect to('/view_maintenance_req')
-end
+end;
 
 
 

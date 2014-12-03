@@ -13,8 +13,9 @@ body
           th Category
           th No. of Apartments
         tbody
-        - for leasingrep in @leasingrep do
+        - for report in @leasingrep do
           tr
-            td.mth = "#{leasingrep["Month"]}"
-            td.cat = "#{leasingrep["Pref_apt_category"]}"
-            td.num = "#{leasingrep["No of Apartments"]}"
+            td.mth = "#{report["Month"]}"
+            td.cat = "#{report["Pref_apt_category"]}"
+            td.num = "#{report["No of Apartments"]}"
+          end
